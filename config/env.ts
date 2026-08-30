@@ -12,8 +12,8 @@ function getEnvVar(key: string, fallback?: string): string {
 }
 
 export const env = {
-  /** URL base de la API Spring Boot */
-  API_BASE_URL: getEnvVar("NEXT_PUBLIC_API_BASE_URL", "http://localhost:8080"),
+  /** URL base de la API (apunta al mismo frontend para que el rewrite de Next.js haga proxy a Spring Boot) */
+  API_BASE_URL: getEnvVar("NEXT_PUBLIC_API_BASE_URL", "http://localhost:3000"),
 
   /** Nombre del entorno actual */
   NODE_ENV: getEnvVar("NODE_ENV", "development"),

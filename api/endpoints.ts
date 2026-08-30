@@ -4,54 +4,77 @@
  */
 
 export const endpoints = {
-  // ── Auth ──────────────────────────────────────────────
+  // ── Auth & Sesión ──────────────────────────────────────
   auth: {
-    login: "/api/v1/auth/login",
-    register: "/api/v1/auth/register",
-    refresh: "/api/v1/auth/refresh",
-    logout: "/api/v1/auth/logout",
-    forgotPassword: "/api/v1/auth/forgot-password",
-    resetPassword: "/api/v1/auth/reset-password",
-    me: "/api/v1/auth/me",
+    csrf: "/api/v1/auth/csrf", // GET
+    login: "/api/v1/auth/login", // POST
+    me: "/api/v1/auth/me", // GET
+    logout: "/api/v1/auth/logout", // POST
   },
 
-  // ── Businesses ────────────────────────────────────────
-  businesses: {
-    list: "/api/v1/businesses",
-    byId: (id: string) => `/api/v1/businesses/${id}`,
-    bySlug: (slug: string) => `/api/v1/businesses/slug/${slug}`,
-    create: "/api/v1/businesses",
-    activate: "/api/v1/businesses/activate",
+  // ── Público: Onboarding & Planes ────────────────────────
+  publico: {
+    planes: "/api/v1/planes", // GET
+    planBeneficios: (codigo: string) => `/api/v1/planes/${codigo}/beneficios`, // GET
+    solicitudesActivacion: "/api/v1/solicitudes-activacion", // POST
+    aceptarInvitacion: "/api/v1/invitaciones-propietario/aceptar", // POST
   },
 
-  // ── Appointments ──────────────────────────────────────
-  appointments: {
-    list: "/api/v1/appointments",
-    byId: (id: string) => `/api/v1/appointments/${id}`,
-    create: "/api/v1/appointments",
-    cancel: (id: string) => `/api/v1/appointments/${id}/cancel`,
+  // ── Público: Reservas & Portal ──────────────────────────
+  reservas: {
+    negocioPortal: (negocioSlug: string) => `/api/v1/publico/negocios/${negocioSlug}`, // GET
+    disponibilidad: (negocioSlug: string) => `/api/v1/publico/negocios/${negocioSlug}/disponibilidad`, // GET
+    crearReserva: (negocioSlug: string) => `/api/v1/publico/negocios/${negocioSlug}/reservas`, // POST
+    cancelarReserva: (reservaId: string) => `/api/v1/publico/reservas/${reservaId}/cancelacion`, // PATCH
+    reprogramarReserva: (reservaId: string) => `/api/v1/publico/reservas/${reservaId}/reprogramacion`, // PUT
   },
 
-  // ── Plans & Entitlements ──────────────────────────────
-  plans: {
-    list: "/api/v1/plans",
-    byId: (id: string) => `/api/v1/plans/${id}`,
-    create: "/api/v1/plans",
-    entitlements: "/api/v1/entitlements",
-  },
-
-  // ── Users (Admin) ─────────────────────────────────────
-  users: {
-    list: "/api/v1/users",
-    byId: (id: string) => `/api/v1/users/${id}`,
-  },
-
-  // ── Public Booking Portal ─────────────────────────────
-  booking: {
-    profile: (slug: string) => `/api/v1/public/${slug}`,
-    services: (slug: string) => `/api/v1/public/${slug}/services`,
-    availability: (slug: string, serviceId: string) =>
-      `/api/v1/public/${slug}/services/${serviceId}/availability`,
-    book: (slug: string) => `/api/v1/public/${slug}/book`,
-  },
+  // ── Superadministrador ──────────────────────────────────
+  admin: {
+    planes: {
+      listar: "/api/v1/admin/planes", // GET
+      actualizar: (codigo: string) => `/api/v1/admin/planes/${codigo}`, // PUT
+      cambiarEstado: (codigo: string) => `/api/v1/admin/planes/${codigo}/estado`, // PATCH
+      entitlements: (codigo: string) => `/api/v1/admin/planes/${codigo}/entitlements`, // GET & PUT
+    },
+    solicitudes: {
+      listar: "/api/v1/admin/solicitudes-activacion", // GET
+      aprobar: (solicitudId: string) => `/api/v1/admin/solicitudes-activacion/${solicitudId}/aprobar`, // POST
+      rechazar: (solicitudId: string) => `/api/v1/admin/solicitudes-activacion/${solicitudId}/rechazar`, // POST
+    },
+    invitaciones: {
+      rotarCodigo: (invitacionId: string) => `/api/v1/admin/invitaciones/${invitacionId}/codigo/rotar`, // POST
+    },
+    negocios: {
+      listar: "/api/v1/admin/negocios", // GET
+      crear: "/api/v1/admin/negocios", // POST
+      consultar: (negocioId: string) => `/api/v1/admin/negocios/${negocioId}`, // GET
+      cambiarEstado: (negocioId: string) => `/api/v1/admin/negocios/${negocioId}/estado`, // PATCH
+    },
+    usuarios: {
+      listar: "/api/v1/admin/usuarios", // GET
+      consultar: (usuarioId: string) => `/api/v1/admin/usuarios/${usuarioId}`, // GET
+      cambiarEstado: (usuarioId: string) => `/api/v1/admin/usuarios/${usuarioId}/estado`, // PATCH
+    },
+    suscripciones: {
+      listar: "/api/v1/admin/suscripciones", // GET
+      consultar: (suscripcionId: string) => `/api/v1/admin/suscripciones/${suscripcionId}`, // GET
+      actualizar: (suscripcionId: string) => `/api/v1/admin/suscripciones/${suscripcionId}`, // PUT
+    },
+    reservas: {
+      listar: "/api/v1/admin/reservas", // GET
+      consultar: (reservaId: string) => `/api/v1/admin/reservas/${reservaId}`, // GET
+      cambiarEstado: (reservaId: string) => `/api/v1/admin/reservas/${reservaId}/estado`, // PATCH
+    },
+    clientes: {
+      listar: "/api/v1/admin/clientes", // GET
+      consultar: (clienteId: string) => `/api/v1/admin/clientes/${clienteId}`, // GET
+      actualizar: (clienteId: string) => `/api/v1/admin/clientes/${clienteId}`, // PUT
+    },
+    notificaciones: {
+      listar: "/api/v1/admin/notificaciones", // GET
+      consultar: (notificacionId: string) => `/api/v1/admin/notificaciones/${notificacionId}`, // GET
+      reintentar: (notificacionId: string) => `/api/v1/admin/notificaciones/${notificacionId}/reintentar`, // POST
+    }
+  }
 } as const;

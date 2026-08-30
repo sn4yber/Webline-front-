@@ -22,11 +22,7 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private getAuthToken(): string | null {
-    if (typeof window === "undefined") return null;
-    // TODO: integrar con el storage de sesión real
-    return localStorage.getItem("accessToken");
-  }
+
 
   private buildUrl(path: string, params?: RequestConfig["params"]): string {
     const url = new URL(path, this.baseUrl);
@@ -38,6 +34,22 @@ class ApiClient {
       });
     }
     return url.toString();
+  }
+
+  private async getCsrfToken(): Promise<string | null> {
+    try {
+      const response = await fetch(this.buildUrl('/api/v1/auth/csrf'), {
+        method: 'GET',
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.token;
+      }
+    } catch (e) {
+      console.warn("No se pudo obtener el token CSRF", e);
+    }
+    return null;
   }
 
   private async request<T>(
@@ -52,15 +64,20 @@ class ApiClient {
       ...((customHeaders as Record<string, string>) ?? {}),
     };
 
-    const token = this.getAuthToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
+    // Ya no se usa Authorization JWT, usamos sesiones directas (cookies).
+
+    if (method !== "GET" && method !== "HEAD") {
+      const csrf = await this.getCsrfToken();
+      if (csrf) {
+        headers["X-XSRF-TOKEN"] = csrf;
+      }
     }
 
     const response = await fetch(this.buildUrl(path, params), {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
+      credentials: "include",
       ...restConfig,
     });
 
@@ -72,7 +89,16 @@ class ApiClient {
         timestamp: new Date().toISOString(),
       }));
 
-      // TODO: manejar 401 → refresh token automático
+      if (response.status === 401) {
+        // Si recibimos 401, la sesión expiró o es inválida
+        if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin") && !window.location.pathname.includes("/admin/login")) {
+          // Limpiamos la cookie de JSESSIONID (solo funciona si no es HttpOnly, pero el backend manda HttpOnly)
+          // Lo mejor es forzar la redirección para que el usuario inicie sesión de nuevo
+          window.location.href = "/admin/login?clear=1";
+        }
+      }
+
+      // TODO: manejar otros errores globales
       throw error;
     }
 
