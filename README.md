@@ -130,28 +130,10 @@ webline-web/
 | **Admin Invitaciones**| `POST` | `/api/v1/admin/invitaciones/{id}/codigo/rotar` | Genera un nuevo código de activación para el negocio |
 | **Admin Negocios** | `GET` | `/api/v1/admin/negocios` | Lista de negocios registrados |
 
----
 
-## ⚡ Instalación y Ejecución Local
-
-### 1. Clonar e instalar dependencias:
-```bash
-cd webline-web
-npm install
 ```
 
-### 2. Variables de Entorno (`.env.local`):
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8080
-```
 
-### 3. Servidor de Desarrollo:
-```bash
-npm run dev
-```
-- **Landing Page:** [http://localhost:3000](http://localhost:3000)
-- **Registro Público:** [http://localhost:3000/activate](http://localhost:3000/activate)
-- **Panel Admin:** [http://localhost:3000/admin](http://localhost:3000/admin)
 
 ---
 
